@@ -1007,7 +1007,7 @@ class MultinomialNaiveBayes(object):
     def score(self, x, y, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False):
         return self.classifier.score(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray(), y)
     
-# 多项分布朴素贝叶斯分类
+# 高斯分布朴素贝叶斯分类
 class GaussianNaiveBayes(object):
 
     def __init__(self, ngram_range=(1, 1), max_features=None, classifier=GaussianNB()):
