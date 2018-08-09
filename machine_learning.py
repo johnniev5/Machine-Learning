@@ -198,7 +198,7 @@ def gscv(estimator, param_grid, cv, X, y, classifier=False, regressor=False, clu
 
 
 # 机器学习模型整合
-def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transactions=None, threshold=0.3, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False,
+def MachineLearning(X_train, y_train, X_test, y_test=None, transactions=None, threshold=0.3, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False,
                    ngram_range=(1, 1), max_features=None, early_stopping_rounds=None, eval_metric=None, eval_set=None,
                    classification=False, logisticregression=False, decisiontreeclassifier=False, svc=False, kneighborsclassifier=False, probability=False, bernoullinb=False, 
                    multinomialnb=False, gaussiannb=False, basehmm=False, multinomialhmm=False, gaussianhmm=False, gmmhmm=False, baggingclassifier=False, randomforestclassifier=False, 
@@ -215,11 +215,11 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             LRClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = LRClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = LRClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():
+            if y_test is None:
+                return LRClassifier, preds, pred_probs
+            else:
                 score = LRClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return LRClassifier, preds, pred_probs, score
-            else:
-                return LRClassifier, preds, pred_probs
         if decisiontreeclassifier:
             DTClassifier = DecisionTreeC(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(DTClassifier, {'max_depth': [5, 8, 15, 25],
@@ -231,11 +231,11 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             DTClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = DTClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = DTClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():
+            if y_test is None:
+                return DTClassifier, preds, pred_probs
+            else:
                 score = DTClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return DTClassifier, preds, pred_probs, score
-            else:
-                return DTClassifier, preds, pred_probs
         if svc:
             SVClassifier = SVClassfication(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(SVClassifier, {'C': [0.01, 0.1, 1.0, 10.0, 50.0, 100.0]}, 5, X_train, y_train,
@@ -244,11 +244,11 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             SVClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = SVClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = SVClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():
+            if y_test is None:
+                return SVClassifier, preds, pred_probs
+            else:
                 score = SVClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return SVClassifier, preds, pred_probs, score
-            else:
-                return SVClassifier, preds, pred_probs
         if kneighborsclassifier:
             KNClassifier = KNeighborsC(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(KNClassifier, {'p': [2, 3, 4, 5]}, 5, X_train, y_train,
@@ -257,42 +257,42 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             KNClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = KNClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = KNClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():
+            if y_test is None:
+                return KNClassifier, preds, pred_probs
+            else:
                 score = KNClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return KNClassifier, preds, pred_probs, score
-            else:
-                return KNClassifier, preds, pred_probs
-        if probability:
+        if probability is None:
             if bernoullinb:
                 BNBClassifier = BernoulliNaiveBayes(ngram_range=ngram_range, max_features=max_features)
                 BNBClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 preds = BNBClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 pred_probs = BNBClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-                if y_test.any():   
+                if y_test is None:   
+                    return BNBClassifier, preds, pred_probs
+                else:
                     score = BNBClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                     return BNBClassifier, preds, pred_probs, score
-                else:
-                    return BNBClassifier, preds, pred_probs
             if multinomialnb:
                 MNBClassifier = MultinomialNaiveBayes(ngram_range=ngram_range, max_features=max_features)
                 MNBClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 preds = MNBClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 pred_probs = MNBClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-                if y_test.any():   
+                if y_test is None:   
+                    return MNBClassifier, preds, pred_probs
+                else:
                     score = MNBClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                     return MNBClassifier, preds, pred_probs, score
-                else:
-                    return MNBClassifier, preds, pred_probs
             if gaussiannb:
                 GNBClassifier = GaussianNaiveBayes(ngram_range=ngram_range, max_features=max_features)
                 GNBClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 preds = GNBClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 pred_probs = GNBClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-                if y_test.any():                 
+                if y_test is None:                 
+                    return GNBClassifier, preds, pred_probs
+                else:
                     score = GNBClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                     return GNBClassifier, preds, pred_probs, score
-                else:
-                    return GNBClassifier, preds, pred_probs
             if basehmm:
                 BHMMClassifier = BaseHiddenMarkovModels(ngram_range=ngram_range, max_features=max_features, classifier=_BaseHMM(n_components=5))
                 BHMMClassifier.fit(X_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
@@ -330,11 +330,11 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             BGClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = BGClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = BGClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():              
+            if y_test is None:              
+                return BGClassifier, preds, pred_probs
+            else:
                 score = BGClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return BGClassifier, preds, pred_probs, score
-            else:
-                return BGClassifier, preds, pred_probs
         if randomforestclassifier:
             RFClassifier = RandomForestC(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(RFClassifier, {'n_estimators': [10, 50, 120, 200],
@@ -349,11 +349,11 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             RFClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = RFClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = RFClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():
+            if y_test is None:
+                return RFClassifier, preds, pred_probs
+            else:
                 score = RFClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return RFClassifier, preds, pred_probs, score
-            else:
-                return RFClassifier, preds, pred_probs
         if adaboostclassifier:
             LRClassifier = LogisticR(ngram_range=ngram_range, max_features=max_features)
             ABClassifier = AdaBoostC(ngram_range=ngram_range, max_features=max_features, classifier=AdaBoostClassifier(base_estimator=LRClassifier.classifier))
@@ -366,50 +366,50 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             ABClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = ABClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = ABClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():            
+            if y_test is None:            
+                return ABClassifier, preds, pred_probs
+            else:
                 score = ABClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return ABClassifier, preds, pred_probs, score
-            else:
-                return ABClassifier, preds, pred_probs
         if gradientboostingclassifier:
             GBClassifier = GradientBoostingC(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(GBClassifier, {'learning_rate': [0.05, 0.1, 0.15, 0.2],
                                                         'n_estimators': [40, 50, 60, 70],
                                                         'max_depth': [3, 5, 7, 9],
-                                                        'min_samples_split': [2, 5, 10, 15],
-                                                        'min_samples_leaf': [1, 2, 5, 10],
+                                                       # 'min_samples_split': [2, 5, 10, 15],
+                                                       # 'min_samples_leaf': [1, 2, 5, 10],
                                                         'subsample': [0.6, 0.7, 0.8, 0.9]}, 5, X_train, y_train,
                                                         classifier=True, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             GBClassifier = GradientBoostingC(ngram_range=ngram_range, max_features=max_features, classifier=GradientBoostingClassifier(n_estimators=bestparams['n_estimators'],
                                                                                   max_depth=bestparams['max_depth'], 
-                                                                                  min_samples_split=bestparams['min_samples_split'], 
-                                                                                  min_samples_leaf=bestparams['min_samples_leaf'],
+                                                                                 # min_samples_split=bestparams['min_samples_split'], 
+                                                                                 # min_samples_leaf=bestparams['min_samples_leaf'],
                                                                                   learning_rate=bestparams['learning_rate'], 
                                                                                   subsample=bestparams['subsample']))
             GBClassifier.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = GBClassifier.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = GBClassifier.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():               
+            if y_test is None:               
+                return GBClassifier, preds, pred_probs
+            else:
                 score = GBClassifier.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return GBClassifier, preds, pred_probs, score
-            else:
-                return GBClassifier, preds, pred_probs
         if xgbclassifier:
             XGBClassification = XGBC(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(XGBClassification, {'learning_rate': [0.05, 0.1, 0.15, 0.2],
                                                              'n_estimators': [40, 50, 60, 70],
                                                              'max_depth': [3, 5, 7, 9],
-                                                             'min_child_weight': [1, 3, 5, 7],
+                                                            # 'min_child_weight': [1, 3, 5, 7],
                                                              'subsample': [0.6, 0.7, 0.8, 0.9],
-                                                             'gamma': [0.05, 0.1, 0.3, 0.5],
+                                                            # 'gamma': [0.05, 0.1, 0.3, 0.5],
                                                              'colsample_bytree': [0.6, 0.7, 0.8, 0.9],
                                                             # 'reg_lambda': [0.01, 0.05, 0.1, 1.0],
                                                             # 'reg_alpha': [0, 0.1, 0.5, 1.0]
                                                               }, 5, X_train, y_train, classifier=True, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             XGBClassification = XGBC(ngram_range=ngram_range, max_features=max_features, classifier=XGBClassifier(n_estimators=bestparams['n_estimators'], 
                                                               max_depth=bestparams['max_depth'], 
-                                                              gamma=bestparams['gamma'], 
-                                                              min_child_weight=bestparams['min_child_weight'], 
+                                                             # gamma=bestparams['gamma'], 
+                                                             # min_child_weight=bestparams['min_child_weight'], 
                                                               subsample=bestparams['subsample'],
                                                               colsample_bytree=bestparams['colsample_bytree'], 
                                                              # reg_lambda=bestparams['reg_lambda'], 
@@ -418,29 +418,29 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             XGBClassification.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = XGBClassification.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = XGBClassification.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():            
+            if y_test is None:            
+                return XGBClassification, preds, pred_probs
+            else:
                 score = XGBClassification.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return XGBClassification, preds, pred_probs, score
-            else:
-                return XGBClassification, preds, pred_probs
         if lgbmclassifier:
             LGBMClassification = LGBMC(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(LGBMClassification, {'learning_rate': [0.05, 0.1, 0.15, 0.2],
-                                                                   'n_estimators': [40, 50, 60, 70],
-                                                                   'max_depth': [3, 5, 7, 9],
-                                                                   'num_leaves': [10, 20, 30, 50],
-                                                                   'min_child_samples': [1, 3, 5, 7],
-                                                                   'min_child_weight': [0.001, 0.005, 0.01, 0.05],
-                                                                   'subsample': [0.6, 0.7, 0.8, 0.9],
-                                                                   'colsample_bytree': [0.6, 0.7, 0.8, 0.9],
-                                                                  # 'reg_lambda': [0.01, 0.05, 0.1, 1.0],
-                                                                  # 'reg_alpha': [0, 0.1, 0.5, 1.0]
-                                                                    }, 5, X_train, y_train, classifier=True, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
+                                                              'n_estimators': [40, 50, 60, 70],
+                                                              'max_depth': [3, 5, 7, 9],
+                                                              'num_leaves': [10, 20, 30, 50],
+                                                              #'min_child_samples': [1, 3, 5, 7],
+                                                              #'min_child_weight': [0.001, 0.005, 0.01, 0.05],
+                                                              'subsample': [0.6, 0.7, 0.8, 0.9],
+                                                              'colsample_bytree': [0.6, 0.7, 0.8, 0.9],
+                                                              # 'reg_lambda': [0.01, 0.05, 0.1, 1.0],
+                                                              # 'reg_alpha': [0, 0.1, 0.5, 1.0]
+                                                              }, 5, X_train, y_train, classifier=True, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             LGBMClassification = LGBMC(ngram_range=ngram_range, max_features=max_features, classifier=LGBMClassifier(n_estimators=bestparams['n_estimators'], 
                                                                 max_depth=bestparams['max_depth'], 
                                                                 colsample_bytree=bestparams['colsample_bytree'], 
-                                                                min_child_weight=bestparams['min_child_weight'], 
-                                                                min_child_samples=bestparams['min_child_samples'],
+                                                               # min_child_weight=bestparams['min_child_weight'], 
+                                                               # min_child_samples=bestparams['min_child_samples'],
                                                                 subsample=bestparams['subsample'], 
                                                                 num_leaves=bestparams['num_leaves'], 
                                                                # reg_lambda=bestparams['reg_lambda'], 
@@ -449,11 +449,11 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             LGBMClassification.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = LGBMClassification.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = LGBMClassification.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():
+            if y_test is None:
+                return LGBMClassification, preds, pred_probs
+            else:
                 score = LGBMClassification.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return LGBMClassification, preds, pred_probs, score
-            else:
-                return LGBMClassification, preds, pred_probs
         if mlpclassifier:
             MLPClassification = MLPC(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(MLPClassification, {'hidden_layer_sizes': [(100,), (300,), (500,), (1000,)],
@@ -468,27 +468,27 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             MLPClassification.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = MLPClassification.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = MLPClassification.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():            
+            if y_test is None:            
+                return MLPClassification, preds, pred_probs
+            else:
                 score = MLPClassification.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return MLPClassification, preds, pred_probs, score
-            else:
-                return MLPClassification, preds, pred_probs
         if tpotclassifier:
             TPOTClassification = TPOTC(ngram_range=ngram_range, max_features=max_features, classifier=TPOTClassifier(generations=10, population_size=50, verbosity=2, n_jobs=-1))
             TPOTClassification.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = TPOTClassification.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             pred_probs = TPOTClassification.predict_proba(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():
+            if y_test is None:
+                return TPOTClassification, preds, pred_probs
+            else:
                 score = TPOTClassification.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return TPOTClassification, preds, pred_probs, score
-            else:
-                return TPOTClassification, preds, pred_probs
     if regression:
         if linearregression:
             LRegressor = LinearR(ngram_range=ngram_range, max_features=max_features)
             LRegressor.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = LRegressor.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():            
+            if y_test is None:            
                 score = LRegressor.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return LRegressor, preds, score
             else:
@@ -503,11 +503,11 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
                                                            min_samples_leaf=bestparams['min_samples_leaf']))
             DTRegressor.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = DTRegressor.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():               
+            if y_test is None:               
+                return DTRegressor, preds
+            else:
                 score = DTRegressor.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return DTRegressor, preds, score
-            else:
-                return DTRegressor, preds
         if svr:
             SVRegressor = SVRegression(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(SVRegressor, {'C': [0.01, 0.1, 1.0, 10.0, 50.0, 100.0],
@@ -516,11 +516,11 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             SVRegressor = SVRegression(ngram_range=ngram_range, max_features=max_features, regressor=SVR(C=bestparams['C'], kernel='linear'))
             SVRegressor.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = SVRegressor.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():             
+            if y_test is None:             
+                return SVRegressor, preds
+            else:
                 score = SVRegressor.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return SVRegressor, preds, score
-            else:
-                return SVRegressor, preds
         if kneighborsregressor:
             KNRegressor = KNeighborsR(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(KNRegressor, {'leaf_size': [10, 20, 30, 50],
@@ -529,11 +529,11 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             KNRegressor = KNeighborsR(ngram_range=ngram_range, max_features=max_features, regressor=KNeighborsRegressor(n_neighbors=2, leaf_size=bestparams['leaf_size'], p=bestparams['p']))
             KNRegressor.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = KNRegressor.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():              
+            if y_test is None:              
+                return KNRegressor, preds
+            else:
                 score = KNRegressor.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return KNRegressor, preds, score
-            else:
-                return KNRegressor, preds
         if baggingregressor:
             LRegressor = LinearR(ngram_range=ngram_range, max_features=max_features)
             BGRegressor = BaggingR(ngram_range=ngram_range, max_features=max_features, regressor=BaggingRegressor(base_estimator=LRegressor.regressor))
@@ -542,27 +542,27 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             BGRegressor = BaggingR(ngram_range=ngram_range, max_features=max_features, regressor=BaggingRegressor(base_estimator=LRegressor.regressor, n_estimators=bestparams['n_estimators']))
             BGRegressor.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = BGRegressor.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():              
+            if y_test is None:              
+                return BGRegressor, preds
+            else:
                 score = BGRegressor.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return BGRegressor, preds, score
-            else:
-                return BGRegressor, preds
         if randomforestregressor:
             RFRegressor = RandomForestR(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(RFRegressor, {'n_estimators': [10, 50, 120, 200],
-                                                                  'max_depth': [5, 8, 15, 25],
-                                                                  'min_samples_split': [2, 5, 10, 15],
-                                                                  'min_samples_leaf': [1, 2, 5, 10]}, 5, X_train, y_train,
-                                                                   regressor=True, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
+                                                       'max_depth': [5, 8, 15, 25],
+                                                       'min_samples_split': [2, 5, 10, 15],
+                                                       'min_samples_leaf': [1, 2, 5, 10]}, 5, X_train, y_train,
+                                                        regressor=True, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             RFRegressor = RandomForestR(ngram_range=ngram_range, max_features=max_features, regressor=RandomForestRegressor(n_estimators=bestparams['n_estimators'], max_depth=bestparams['max_depth'], 
                                                    min_samples_split=bestparams['min_samples_split'], min_samples_leaf=bestparams['min_samples_leaf']))
             RFRegressor.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = RFRegressor.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():             
+            if y_test is None:             
+                return RFRegressor, preds
+            else:
                 score = RFRegressor.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return RFRegressor, preds, score
-            else:
-                return RFRegressor, preds
         if adaboostregressor:
             LRegressor = LinearR(ngram_range=ngram_range, max_features=max_features)
             ABRegressor = AdaBoostR(ngram_range=ngram_range, max_features=max_features, regressor=AdaBoostRegressor(base_estimator=LRegressor.regressor))
@@ -573,51 +573,52 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
                                                           learning_rate=bestparams['learning_rate']))
             ABRegressor.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = ABRegressor.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():            
+            if y_test is None:            
+                return ABRegressor, preds
+            else:
                 score = ABRegressor.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return ABRegressor, preds, score
-            else:
-                return ABRegressor, preds
         if gradientboostingregressor:
             GBRegressor = GradientBoostingR(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(GBRegressor, {'learning_rate': [0.05, 0.1, 0.15, 0.2],
                                                        'n_estimators': [40, 50, 60, 70],
                                                        'max_depth': [3, 5, 7, 9],
-                                                       'min_samples_split': [2, 5, 10, 15],
-                                                       'min_samples_leaf': [1, 2, 5, 10],
+                                                      # 'min_samples_split': [2, 5, 10, 15],
+                                                      # 'min_samples_leaf': [1, 2, 5, 10],
                                                        'subsample': [0.6, 0.7, 0.8, 0.9],
-                                                       'alpha': [0, 0.1, 0.5, 1.0]}, 5, X_train, y_train,
-                                                       regressor=True, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
+                                                      # 'alpha': [0, 0.1, 0.5, 1.0]
+                                                      }, 5, X_train, y_train, regressor=True, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             GBRegressor = GradientBoostingR(ngram_range=ngram_range, max_features=max_features, regressor=GradientBoostingRegressor(n_estimators=bestparams['n_estimators'],
                                                                                 max_depth=bestparams['max_depth'], 
-                                                                                min_samples_split=bestparams['min_samples_split'], 
-                                                                                min_samples_leaf=bestparams['min_samples_leaf'],
+                                                                               # min_samples_split=bestparams['min_samples_split'], 
+                                                                               # min_samples_leaf=bestparams['min_samples_leaf'],
                                                                                 learning_rate=bestparams['learning_rate'], 
                                                                                 subsample=bestparams['subsample'],
-                                                                                alpha=bestparams['alpha']))
+                                                                               # alpha=bestparams['alpha']
+                                                                               ))
             GBRegressor.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = GBRegressor.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():      
+            if y_test is None:      
+                return GBRegressor, preds
+            else:
                 score = GBRegressor.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return GBRegressor, preds, score
-            else:
-                return GBRegressor, preds
         if xgbregressor:
             XGBRegression = XGBR(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(XGBRegression, {'learning_rate': [0.05, 0.1, 0.15, 0.2],
-                                                                   'n_estimators': [40, 50, 60, 70],
-                                                                   'max_depth': [3, 5, 7, 9],
-                                                                   'min_child_weight': [1, 3, 5, 7],
-                                                                   'subsample': [0.6, 0.7, 0.8, 0.9],
-                                                                   'gamma': [0.05, 0.1, 0.3, 0.5],
-                                                                   'colsample_bytree': [0.6, 0.7, 0.8, 0.9],
-                                                                  # 'reg_lambda': [0.01, 0.05, 0.1, 1.0],
-                                                                  # 'reg_alpha': [0, 0.1, 0.5, 1.0]
-                                                                  }, 5, X_train, y_train, regressor=True, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
+                                                         'n_estimators': [40, 50, 60, 70],
+                                                         'max_depth': [3, 5, 7, 9],
+                                                         # 'min_child_weight': [1, 3, 5, 7],
+                                                         'subsample': [0.6, 0.7, 0.8, 0.9],
+                                                         # 'gamma': [0.05, 0.1, 0.3, 0.5],
+                                                         'colsample_bytree': [0.6, 0.7, 0.8, 0.9],
+                                                         # 'reg_lambda': [0.01, 0.05, 0.1, 1.0],
+                                                         # 'reg_alpha': [0, 0.1, 0.5, 1.0]
+                                                          }, 5, X_train, y_train, regressor=True, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             XGBRegression = XGBR(ngram_range=ngram_range, max_features=max_features, regressor=XGBRegressor(n_estimators=bestparams['n_estimators'], 
                                                           max_depth=bestparams['max_depth'], 
-                                                          gamma=bestparams['gamma'], 
-                                                          min_child_weight=bestparams['min_child_weight'], 
+                                                         # gamma=bestparams['gamma'], 
+                                                         # min_child_weight=bestparams['min_child_weight'], 
                                                           subsample=bestparams['subsample'],
                                                           colsample_bytree=bestparams['colsample_bytree'], 
                                                          # reg_lambda=bestparams['reg_lambda'], 
@@ -626,19 +627,19 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             XGBRegression.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer,
                 early_stopping_rounds=early_stopping_rounds, eval_metric=eval_metric, eval_set=eval_set)
             preds = XGBRegression.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():              
+            if y_test is None:              
+                return XGBRegression, preds
+            else:
                 score = XGBRegression.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return XGBRegression, preds, score
-            else:
-                return XGBRegression, preds
         if lgbmregressor:
             LGBMRegression = LGBMR(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(LGBMRegression, {'learning_rate': [0.05, 0.1, 0.15, 0.2],
                                                           'n_estimators': [40, 50, 60, 70],
                                                           'max_depth': [3, 5, 7, 9],
                                                           'num_leaves': [10, 20, 30, 50],
-                                                          'min_child_samples': [1, 3, 5, 7],
-                                                          'min_child_weight': [0.001, 0.005, 0.01, 0.05],
+                                                         # 'min_child_samples': [1, 3, 5, 7],
+                                                         # 'min_child_weight': [0.001, 0.005, 0.01, 0.05],
                                                           'subsample': [0.6, 0.7, 0.8, 0.9],
                                                           'colsample_bytree': [0.6, 0.7, 0.8, 0.9],
                                                          # 'reg_lambda': [0.01, 0.05, 0.1, 1.0],
@@ -647,8 +648,8 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             LGBMRegression = LGBMR(ngram_range=ngram_range, max_features=max_features, regressor=LGBMRegressor(n_estimators=bestparams['n_estimators'], 
                                                             max_depth=bestparams['max_depth'], 
                                                             colsample_bytree=bestparams['colsample_bytree'], 
-                                                            min_child_weight=bestparams['min_child_weight'], 
-                                                            min_child_samples=bestparams['min_child_samples'],
+                                                           # min_child_weight=bestparams['min_child_weight'], 
+                                                           # min_child_samples=bestparams['min_child_samples'],
                                                             subsample=bestparams['subsample'], 
                                                             num_leaves=bestparams['num_leaves'], 
                                                            # reg_lambda=bestparams['reg_lambda'], 
@@ -657,11 +658,11 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
             LGBMRegression.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer,
                 early_stopping_rounds=early_stopping_rounds, eval_metric=eval_metric, eval_set=eval_set)
             preds = LGBMRegression.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():                
+            if y_test is None:                
+                return LGBMRegression, preds
+            else:
                 score = LGBMRegression.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return LGBMRegression, preds, score
-            else:
-                return LGBMRegression, preds
         if mlpregressor:
             MLPRegression = MLPR(ngram_range=ngram_range, max_features=max_features)
             bestscore, bestparams = gscv(MLPRegression, {'hidden_layer_sizes': [(100,), (300,), (500,)],
@@ -675,20 +676,20 @@ def MachineLearning(X_train=None, y_train=None, X_test=None, y_test=None, transa
                                                           max_iter=bestparams['max_iter']))
             MLPRegression.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = MLPRegression.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():              
+            if y_test is None:              
+                return MLPRegression, preds
+            else:
                 score = MLPRegression.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return MLPRegression, preds, score
-            else:
-                return MLPRegression, preds
         if tpotregressor:
             TPOTRegression = TPOTR(ngram_range=ngram_range, max_features=max_features, regressor=TPOTRegressor(generations=100, population_size=100, verbosity=2, n_jobs=-1))
             TPOTRegression.fit(X_train, y_train, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
             preds = TPOTRegression.predict(X_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
-            if y_test.any():               
+            if y_test is None:               
+                return TPOTRegression, preds
+            else:
                 score = TPOTRegression.score(X_test, y_test, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer)
                 return TPOTRegression, preds, score
-            else:
-                return TPOTRegression, preds
     if clustering:
         if kmeans:
             KMCluster = KmeansClustering(ngram_range=ngram_range, max_features=max_features)
@@ -757,7 +758,7 @@ class LogisticR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -770,7 +771,7 @@ class LogisticR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -802,7 +803,7 @@ class DecisionTreeC(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -815,7 +816,7 @@ class DecisionTreeC(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -846,7 +847,7 @@ class SVClassfication(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -859,7 +860,7 @@ class SVClassfication(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -890,7 +891,7 @@ class KNeighborsC(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -903,7 +904,7 @@ class KNeighborsC(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -934,7 +935,7 @@ class BernoulliNaiveBayes(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -947,7 +948,7 @@ class BernoulliNaiveBayes(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -978,7 +979,7 @@ class MultinomialNaiveBayes(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -991,7 +992,7 @@ class MultinomialNaiveBayes(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1022,7 +1023,7 @@ class GaussianNaiveBayes(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1035,7 +1036,7 @@ class GaussianNaiveBayes(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1322,7 +1323,7 @@ class RandomForestC(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1335,7 +1336,7 @@ class RandomForestC(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1366,7 +1367,7 @@ class AdaBoostC(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1379,7 +1380,7 @@ class AdaBoostC(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1411,7 +1412,7 @@ class GradientBoostingC(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1424,7 +1425,7 @@ class GradientBoostingC(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1442,7 +1443,7 @@ class GradientBoostingC(object):
 # XGBoost分类
 class XGBC(object):
 
-    def __init__(self, ngram_range=(1, 1), max_features=None, classifier=XGBClassifier(max_depth=3, learning_rate=0.1, n_estimators=100, objective='binary:logistic', booster='gbtree',
+    def __init__(self, ngram_range=(1, 1), max_features=None, classifier=XGBClassifier(max_depth=3, learning_rate=0.1, n_estimators=100, objective='binary is None:logistic', booster='gbtree',
                                                n_jobs=1, gamma=0, min_child_weight=1, max_delta_step=0, subsample=1, colsample_bytree=1,
                                                reg_alpha=0, reg_lambda=1, scale_pos_weight=1)):
         self.classifier = classifier
@@ -1457,7 +1458,7 @@ class XGBC(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1470,7 +1471,7 @@ class XGBC(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1504,7 +1505,7 @@ class LGBMC(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1517,7 +1518,7 @@ class LGBMC(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1554,7 +1555,7 @@ class MLPC(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1567,7 +1568,7 @@ class MLPC(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1598,7 +1599,7 @@ class TPOTC(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1611,7 +1612,7 @@ class TPOTC(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1658,7 +1659,7 @@ class LinearR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1671,7 +1672,7 @@ class LinearR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1700,7 +1701,7 @@ class DecisionTreeR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1713,7 +1714,7 @@ class DecisionTreeR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1741,7 +1742,7 @@ class SVRegression(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1754,7 +1755,7 @@ class SVRegression(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1782,7 +1783,7 @@ class KNeighborsR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1795,7 +1796,7 @@ class KNeighborsR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1824,7 +1825,7 @@ class BaggingR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1837,7 +1838,7 @@ class BaggingR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1866,7 +1867,7 @@ class RandomForestR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1879,7 +1880,7 @@ class RandomForestR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1907,7 +1908,7 @@ class AdaBoostR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1920,7 +1921,7 @@ class AdaBoostR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1950,7 +1951,7 @@ class GradientBoostingR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -1963,7 +1964,7 @@ class GradientBoostingR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -1993,7 +1994,7 @@ class XGBR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -2006,7 +2007,7 @@ class XGBR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -2037,7 +2038,7 @@ class LGBMR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -2050,7 +2051,7 @@ class LGBMR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -2083,7 +2084,7 @@ class MLPR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -2096,7 +2097,7 @@ class MLPR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -2124,7 +2125,7 @@ class TPOTR(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -2137,7 +2138,7 @@ class TPOTR(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -2185,7 +2186,7 @@ class KmeansClustering(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -2198,7 +2199,7 @@ class KmeansClustering(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
@@ -2227,7 +2228,7 @@ class SClustering(object):
         elif onehotencoder:
             return self.onehotencoder.transform(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 return self.labelencoder.transform(y)
         elif vectorizer:
             return self.vectorizer.transform(X)
@@ -2240,7 +2241,7 @@ class SClustering(object):
         elif onehotencoder:
             self.onehotencoder.fit(X)
         elif labelencoder:
-            if y.any():
+            if y is None:
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
