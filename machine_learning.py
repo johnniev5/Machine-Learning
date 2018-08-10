@@ -1629,9 +1629,9 @@ class TPOTC(object):
     
     def predict_proba(self, x, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False):
         if isinstance(x, pd.DataFrame):
-            return self.classifier.predict(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer))
+            return self.classifier.predict_proba(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer))
         else:
-            return self.classifier.predict(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray())
+            return self.classifier.predict_proba(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray())
     
     def score(self, x, y, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False):
         if isinstance(x, pd.DataFrame):
@@ -2148,12 +2148,6 @@ class TPOTR(object):
             self.regressor.fit(self.features(X, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray(), np.array(y))
         
     def predict(self, x, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False):
-        if isinstance(x, pd.DataFrame):
-            return self.regressor.predict(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer))
-        else:
-            return self.regressor.predict(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray())
-    
-    def predict_proba(self, x, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False):
         if isinstance(x, pd.DataFrame):
             return self.regressor.predict(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer))
         else:
