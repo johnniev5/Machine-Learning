@@ -1491,8 +1491,8 @@ class XGBC(object):
 class LGBMC(object):
 
     def __init__(self, ngram_range=(1, 1), max_features=None, classifier=LGBMClassifier(boosting_type='gbdt', num_leaves=31, max_depth=-1, learning_rate=0.1, n_estimators=100, 
-                                               class_weight=None, min_split_gain=0.0, min_child_weight=0.001, min_child_samples=20, subsample=1.0, 
-                                               colsample_bytree=1.0, reg_alpha=0.0, reg_lambda=0.0, n_jobs=1)):
+                                               class_weight=None, min_split_gain=0.0, min_child_weight=0.001, min_child_samples=5, subsample=1.0, 
+                                               colsample_bytree=1.0, reg_alpha=0.0, reg_lambda=0.0, n_jobs=1, verbose=-1)):
         self.classifier = classifier
         self.stdscaler = StandardScaler()
         self.onehotencoder = OneHotEncoder()
@@ -2024,8 +2024,8 @@ class XGBR(object):
 class LGBMR(object):
 
     def __init__(self, ngram_range=(1, 1), max_features=None, regressor=LGBMRegressor(boosting_type='gbdt', num_leaves=31, max_depth=-1, learning_rate=0.1, n_estimators=100, 
-                                               class_weight=None, min_split_gain=0.0, min_child_weight=0.001, min_child_samples=20, subsample=1.0, 
-                                               colsample_bytree=1.0, reg_alpha=0.0, reg_lambda=0.0, n_jobs=1)):
+                                               class_weight=None, min_split_gain=0.0, min_child_weight=0.001, min_child_samples=5, subsample=1.0, 
+                                               colsample_bytree=1.0, reg_alpha=0.0, reg_lambda=0.0, n_jobs=1, verbose=-1)):
         self.regressor = regressor
         self.stdscaler = StandardScaler()
         self.onehotencoder = OneHotEncoder()
