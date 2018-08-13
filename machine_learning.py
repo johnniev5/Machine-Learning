@@ -165,15 +165,21 @@ def downsampling(data, ratio, classes):
 
 
 # 特征选择
-def featuresselection(X, y, k=2, n_features_to_select=2, estimator=None,
-                      selectkbest=False, rfe=False, selectfrommodel=False):
+def featuresselection(X, y=None, k=2, n_features_to_select=2, estimator=None,
+                      selectkbest=False, rfe=False, selectfrommodel=False, classifier=False, regressor=False):
     if selectkbest:
         return SelectKBest(k=2).fit_transform(X, y)
     if rfe:
-        rfe = RFE(estimator=estimator, n_features_to_select=n_features_to_select)
+        if classifier:
+            rfe = RFE(estimator=estimator.classifier, n_features_to_select=n_features_to_select)
+        elif regressor:
+            rfe = RFE(estimator=estimator.regressor, n_features_to_select=n_features_to_select)
         return rfe.fit_transform(X, y)
     if selectfrommodel:
-        model = SelectFromModel(estimator=estimator, prefit=True)
+        if classifier:
+            model = SelectFromModel(estimator=estimator.classifier, prefit=True)
+        elif regressor:
+            model = SelectFromModel(estimator=estimator.regressor, prefit=True)
         return model.transform(X)
 
 
@@ -1616,29 +1622,29 @@ class TPOTC(object):
                 self.labelencoder.fit(y)
         elif vectorizer:
             self.vectorizer.fit(X)
-        if isinstance(X, pd.DataFrame):
+        if isinstance(X, pd.DataFrame):     
             self.classifier.fit(self.features(X, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer), y)
         else:
             self.classifier.fit(self.features(X, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray(), np.array(y))
         
     def predict(self, x, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False):
-        if isinstance(x, pd.DataFrame):
+        if isinstance(X, pd.DataFrame):   
             return self.classifier.predict(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer))
         else:
             return self.classifier.predict(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray())
     
     def predict_proba(self, x, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False):
-        if isinstance(x, pd.DataFrame):
+        if isinstance(X, pd.DataFrame):
             return self.classifier.predict_proba(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer))
         else:
             return self.classifier.predict_proba(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray())
     
     def score(self, x, y, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False):
-        if isinstance(x, pd.DataFrame):
+        if isinstance(X, pd.DataFrame):
             return self.classifier.score(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer), y)
         else:
-            return self.classifier.score(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray(), np.array(y))
 
+            return self.classifier.score(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray(), np.array(y))
 
 # In[22]:
 
@@ -2148,13 +2154,13 @@ class TPOTR(object):
             self.regressor.fit(self.features(X, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray(), np.array(y))
         
     def predict(self, x, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False):
-        if isinstance(x, pd.DataFrame):
+        if isinstance(X, pd.DataFrame):
             return self.regressor.predict(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer))
         else:
             return self.regressor.predict(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray())
     
     def score(self, x, y, stdscaler=False, onehotencoder=False, labelencoder=False, vectorizer=False):
-        if isinstance(x, pd.DataFrame):
+        if isinstance(X, pd.DataFrame):
             return self.regressor.score(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer), y)
         else:
             return self.regressor.score(self.features(x, stdscaler=stdscaler, onehotencoder=onehotencoder, labelencoder=labelencoder, vectorizer=vectorizer).toarray(), np.array(y))
